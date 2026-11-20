@@ -1,0 +1,32 @@
+{
+  "name": "pawpals-backend",
+  "version": "1.0.0",
+  "description": "PawPals modular-monolith backend implementing frozen API Contract AC-01 through AC-12",
+  "main": "dist/server.js",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "worker": "node dist/jobs/worker.js",
+    "verify:routes": "node ../scripts/verify-route-coverage.mjs",
+    "test": "npm run verify:routes && npm run typecheck && npm run build && node --test tests/*.test.cjs",
+    "test:otp": "npm run build && node --test tests/otp.test.cjs",
+    "test:integration": "npm run build && node --test tests/capacity-postgres.test.cjs",
+    "outbox:replay": "node scripts/replay-outbox.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bullmq": "^5.58.5",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "ioredis": "^5.7.0",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

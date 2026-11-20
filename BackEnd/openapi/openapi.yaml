@@ -1,0 +1,4534 @@
+openapi: 3.1.0
+info:
+  title: PawPals API
+  version: 1.2.0
+  description: Machine-readable API contract derived from the FINAL/FROZEN PawPals API Contract AC-01 through AC-12 after
+    Final API Cross-Review PASSED. Base path /api/v1. This file must not introduce new MVP scope.
+servers:
+- url: /api/v1
+  description: PawPals API v1
+tags:
+- name: AC-01 Auth & Account
+- name: AC-02 Vendor Registration & Verification
+- name: AC-03 Location
+- name: AC-04 Pet Profile & Safety
+- name: AC-05 Service / Package / Availability / Capacity
+- name: AC-06 Booking & Capacity
+- name: AC-07 Payment & Refund
+- name: AC-08 Cancellation & Reschedule
+- name: AC-09 Finance / Ledger / Settlement / Payout
+- name: AC-10 Interaction / Milestone / Review
+- name: AC-11 Trust & Safety
+- name: AC-12 Admin / RBAC / Audit
+paths:
+  /auth/register:
+    post:
+      tags:
+      - AC-01 Auth & Account
+      summary: Register a PawPals account
+      operationId: registerAccount
+      responses:
+        '201': &id002
+          $ref: '#/components/responses/Success'
+        '400': &id001
+          $ref: '#/components/responses/Error'
+        '409': *id001
+        '429': *id001
+        '503': *id001
+      security: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+  /auth/otp/verify:
+    post:
+      tags:
+      - AC-01 Auth & Account
+      summary: Verify purpose-aware OTP
+      operationId: verifyOtp
+      responses:
+        '200': *id002
+        '422': *id001
+        '429': *id001
+      security: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OtpVerifyRequest'
+  /auth/otp/resend:
+    post:
+      tags:
+      - AC-01 Auth & Account
+      summary: Resend or replace OTP challenge
+      operationId: resendOtp
+      responses:
+        '202': *id002
+        '422': *id001
+        '429': *id001
+        '503': *id001
+      security: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OtpResendRequest'
+  /auth/login:
+    post:
+      tags:
+      - AC-01 Auth & Account
+      summary: Login with phone and password
+      operationId: login
+      responses:
+        '200': *id002
+        '401': *id001
+        '403': *id001
+        '429': *id001
+      security: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+  /auth/logout:
+    post:
+      tags:
+      - AC-01 Auth & Account
+      summary: Revoke current session
+      operationId: logout
+      responses:
+        '204': &id004
+          description: No Content
+        '401': *id001
+      security:
+      - SessionCookie: []
+  /accounts/me:
+    get:
+      tags:
+      - AC-01 Auth & Account
+      summary: Get current account
+      operationId: getCurrentAccount
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+  /auth/password/forgot:
+    post:
+      tags:
+      - AC-01 Auth & Account
+      summary: Request password reset
+      operationId: forgotPassword
+      responses:
+        '202': *id002
+        '429': *id001
+        '503': *id001
+      security: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+  /auth/password/reset:
+    post:
+      tags:
+      - AC-01 Auth & Account
+      summary: Reset password using short-lived authorization
+      operationId: resetPassword
+      responses:
+        '200': *id002
+        '422': *id001
+      security: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+  /auth/reauth:
+    post:
+      tags:
+      - AC-01 Auth & Account
+      summary: Create recent reauthentication grant
+      operationId: reauthenticate
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReauthRequest'
+  /auth/sensitive-otp/request:
+    post:
+      tags:
+      - AC-01 Auth & Account
+      summary: Request OTP for sensitive action
+      operationId: requestSensitiveOtp
+      responses:
+        '202': *id002
+        '429': *id001
+        '503': *id001
+      security:
+      - SessionCookie: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensitiveOtpRequest'
+  /auth/sensitive-otp/verify:
+    post:
+      tags:
+      - AC-01 Auth & Account
+      summary: Verify purpose-bound sensitive OTP
+      operationId: verifySensitiveOtp
+      responses:
+        '200': *id002
+        '422': *id001
+        '429': *id001
+      security:
+      - SessionCookie: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensitiveOtpVerifyRequest'
+  /vendor-applications:
+    post:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Start vendor application
+      operationId: createVendorApplication
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '409': *id001
+      security:
+      - SessionCookie: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorApplicationCreateRequest'
+  /vendors/me:
+    get:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Get current vendor profile
+      operationId: getMyVendor
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+  /vendor-applications/me:
+    get:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Get current vendor application
+      operationId: getMyVendorApplication
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+  /vendor-applications/{id}:
+    get:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Get own vendor application
+      operationId: getVendorApplication
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Update own vendor application
+      operationId: updateVendorApplication
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericWritePayload'
+  /vendor-applications/{id}/terms/accept:
+    post:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Accept vendor terms
+      operationId: acceptVendorTerms
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TermsAcceptanceRequest'
+  /vendor-applications/{id}/documents/upload-intent:
+    post:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Create verification-document upload intent
+      operationId: createVerificationUploadIntent
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadIntentRequest'
+  /vendor-applications/{id}/documents:
+    post:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Attach verification document
+      operationId: attachVerificationDocument
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationDocumentAttachRequest'
+    get:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: List own verification documents
+      operationId: listVerificationDocuments
+      responses:
+        '200': &id003
+          $ref: '#/components/responses/Paginated'
+        '401': *id001
+        '403': *id001
+        '404': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /vendor-applications/{id}/submit:
+    post:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Submit vendor application
+      operationId: submitVendorApplication
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /admin/vendor-applications:
+    get:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: List vendor applications for review
+      operationId: adminListVendorApplications
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-pawpals-permission: operations.vendor_application.review
+  /admin/vendor-applications/{id}/review/start:
+    post:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Start vendor application review
+      operationId: startVendorApplicationReview
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      x-pawpals-permission: operations.vendor_application.review
+  /admin/vendor-applications/{applicationId}/documents/{documentId}/review:
+    post:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Review a verification document
+      operationId: reviewVerificationDocument
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: applicationId
+        in: path
+        required: true
+        description: applicationId UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: documentId
+        in: path
+        required: true
+        description: documentId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationDocumentReviewRequest'
+      x-pawpals-permission: operations.vendor_application.review
+  /admin/vendor-applications/{id}/request-revision:
+    post:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Request vendor application revision
+      operationId: requestVendorApplicationRevision
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      x-pawpals-permission: operations.vendor_application.review
+  /admin/vendor-applications/{id}/approve:
+    post:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Approve vendor application
+      operationId: approveVendorApplication
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: false
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptionalReasonRequest'
+      x-pawpals-permission: operations.vendor_application.review
+  /admin/vendor-applications/{id}/reject:
+    post:
+      tags:
+      - AC-02 Vendor Registration & Verification
+      summary: Reject vendor application
+      operationId: rejectVendorApplication
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      x-pawpals-permission: operations.vendor_application.review
+  /customer-addresses:
+    get:
+      tags:
+      - AC-03 Location
+      summary: List own customer addresses
+      operationId: listCustomerAddresses
+      responses:
+        '200': *id003
+        '401': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      tags:
+      - AC-03 Location
+      summary: Create customer address
+      operationId: createCustomerAddress
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressWriteRequest'
+  /customer-addresses/{id}:
+    get:
+      tags:
+      - AC-03 Location
+      summary: Get own customer address
+      operationId: getCustomerAddress
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags:
+      - AC-03 Location
+      summary: Update own customer address
+      operationId: updateCustomerAddress
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressWriteRequest'
+    delete:
+      tags:
+      - AC-03 Location
+      summary: Delete own customer address
+      operationId: deleteCustomerAddress
+      responses:
+        '204': *id004
+        '401': *id001
+        '404': *id001
+        '409': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /customer-addresses/{id}/default:
+    put:
+      tags:
+      - AC-03 Location
+      summary: Atomically set default customer address
+      operationId: setDefaultCustomerAddress
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /vendors/me/locations:
+    get:
+      tags:
+      - AC-03 Location
+      summary: List own vendor locations
+      operationId: listVendorLocations
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      tags:
+      - AC-03 Location
+      summary: Create vendor location
+      operationId: createVendorLocation
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorLocationWriteRequest'
+  /vendors/me/locations/{id}:
+    get:
+      tags:
+      - AC-03 Location
+      summary: Get vendor location detail
+      operationId: getVendorLocation
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags:
+      - AC-03 Location
+      summary: Update vendor location
+      operationId: updateVendorLocation
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorLocationWriteRequest'
+    delete:
+      tags:
+      - AC-03 Location
+      summary: Delete vendor location if not in use
+      operationId: deleteVendorLocation
+      responses:
+        '204': *id004
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /pets:
+    get:
+      tags:
+      - AC-04 Pet Profile & Safety
+      summary: List own pets
+      operationId: listPets
+      responses:
+        '200': *id003
+        '401': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      tags:
+      - AC-04 Pet Profile & Safety
+      summary: Create pet
+      operationId: createPet
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetWriteRequest'
+  /pets/{id}:
+    get:
+      tags:
+      - AC-04 Pet Profile & Safety
+      summary: Get own pet detail
+      operationId: getPet
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags:
+      - AC-04 Pet Profile & Safety
+      summary: Update own pet profile
+      operationId: updatePet
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetWriteRequest'
+  /pets/{id}/safety-profile:
+    get:
+      tags:
+      - AC-04 Pet Profile & Safety
+      summary: Get pet safety profile
+      operationId: getPetSafetyProfile
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+    put:
+      tags:
+      - AC-04 Pet Profile & Safety
+      summary: Create or replace pet safety profile
+      operationId: putPetSafetyProfile
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetSafetyProfileWriteRequest'
+    patch:
+      tags:
+      - AC-04 Pet Profile & Safety
+      summary: Partially update pet safety profile
+      operationId: patchPetSafetyProfile
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetSafetyProfileWriteRequest'
+  /pets/{id}/photo/upload-intent:
+    post:
+      tags:
+      - AC-04 Pet Profile & Safety
+      summary: Create pet-photo upload intent
+      operationId: createPetPhotoUploadIntent
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadIntentRequest'
+  /pets/{id}/photo:
+    get:
+      summary: Signed GET URL for current owner pet photo
+      operationId: getPetPhoto
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '404':
+          $ref: '#/components/responses/Error'
+
+    put:
+      tags:
+      - AC-04 Pet Profile & Safety
+      summary: Attach uploaded pet photo
+      operationId: attachPetPhoto
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaAttachRequest'
+    delete:
+      tags:
+      - AC-04 Pet Profile & Safety
+      summary: Detach pet photo
+      operationId: detachPetPhoto
+      responses:
+        '204': *id004
+        '401': *id001
+        '404': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /vendors/me/services:
+    get:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: List own vendor services
+      operationId: listMyServices
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Create vendor service
+      operationId: createVendorService
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorServiceWriteRequest'
+  /vendors/me/services/{serviceId}:
+    patch:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Update vendor service
+      operationId: updateVendorService
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorServiceWriteRequest'
+  /vendors/me/services/{serviceId}/activate:
+    post:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Activate vendor service
+      operationId: activateVendorService
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+  /vendors/me/services/{serviceId}/deactivate:
+    post:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Deactivate vendor service
+      operationId: deactivateVendorService
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+  /vendors/me/services/{serviceId}/packages:
+    get:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: List service packages
+      operationId: listServicePackages
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+        '404': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Create service package
+      operationId: createServicePackage
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicePackageWriteRequest'
+  /vendors/me/services/{serviceId}/packages/{packageId}:
+    patch:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Update service package
+      operationId: updateServicePackage
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: packageId
+        in: path
+        required: true
+        description: packageId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicePackageWriteRequest'
+  /vendors/me/services/{serviceId}/packages/{packageId}/activate:
+    post:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Activate service package
+      operationId: activateServicePackage
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: packageId
+        in: path
+        required: true
+        description: packageId UUID.
+        schema:
+          type: string
+          format: uuid
+  /vendors/me/services/{serviceId}/packages/{packageId}/deactivate:
+    post:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Deactivate service package
+      operationId: deactivateServicePackage
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: packageId
+        in: path
+        required: true
+        description: packageId UUID.
+        schema:
+          type: string
+          format: uuid
+  /vendors/me/services/{serviceId}/pet-rules:
+    get:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Get service pet rules
+      operationId: getServicePetRules
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+    put:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Create or replace service pet rules
+      operationId: putServicePetRules
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetRulesWriteRequest'
+  /vendors/me/services/{serviceId}/availability:
+    get:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: List availability windows
+      operationId: listAvailabilityWindows
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+        '404': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Create availability window
+      operationId: createAvailabilityWindow
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeWindowWriteRequest'
+  /vendors/me/services/{serviceId}/availability/{windowId}:
+    patch:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Update availability window
+      operationId: updateAvailabilityWindow
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: windowId
+        in: path
+        required: true
+        description: windowId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeWindowWriteRequest'
+    delete:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Delete availability window
+      operationId: deleteAvailabilityWindow
+      responses:
+        '204': *id004
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: windowId
+        in: path
+        required: true
+        description: windowId UUID.
+        schema:
+          type: string
+          format: uuid
+  /vendors/me/services/{serviceId}/capacity-overrides:
+    get:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: List capacity overrides
+      operationId: listCapacityOverrides
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+        '404': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Create capacity override
+      operationId: createCapacityOverride
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapacityOverrideWriteRequest'
+  /vendors/me/services/{serviceId}/capacity-overrides/{overrideId}:
+    patch:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Update capacity override
+      operationId: updateCapacityOverride
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: overrideId
+        in: path
+        required: true
+        description: overrideId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapacityOverrideWriteRequest'
+    delete:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Delete capacity override
+      operationId: deleteCapacityOverride
+      responses:
+        '204': *id004
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: overrideId
+        in: path
+        required: true
+        description: overrideId UUID.
+        schema:
+          type: string
+          format: uuid
+  /services:
+    get:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Public service discovery
+      description: Includes minimum active package price (min_price) and public business city (public_city), both nullable.
+      operationId: discoverServices
+      responses:
+        '200': *id003
+        '400': *id001
+      security: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /services/{serviceId}:
+    get:
+      tags:
+      - AC-05 Service / Package / Availability / Capacity
+      summary: Get public service detail
+      operationId: getPublicService
+      responses:
+        '200': *id002
+        '404': *id001
+      security: []
+      parameters:
+      - name: serviceId
+        in: path
+        required: true
+        description: serviceId UUID.
+        schema:
+          type: string
+          format: uuid
+  /bookings:
+    post:
+      tags:
+      - AC-06 Booking & Capacity
+      summary: 'Continue to payment: create booking, pending payment, and held capacity'
+      operationId: createBooking
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+    get:
+      tags:
+      - AC-06 Booking & Capacity
+      summary: List customer bookings
+      operationId: listBookings
+      responses:
+        '200': *id003
+        '401': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /bookings/{id}:
+    get:
+      tags:
+      - AC-06 Booking & Capacity
+      summary: Get customer booking detail
+      operationId: getBooking
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /vendors/me/bookings:
+    get:
+      tags:
+      - AC-06 Booking & Capacity
+      summary: List vendor bookings
+      operationId: listVendorBookings
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /vendors/me/bookings/{id}:
+    get:
+      tags:
+      - AC-06 Booking & Capacity
+      summary: Get vendor booking detail
+      operationId: getVendorBooking
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /vendors/me/bookings/{id}/start:
+    post:
+      tags:
+      - AC-06 Booking & Capacity
+      summary: Start service execution
+      operationId: startBooking
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /vendors/me/bookings/{id}/complete:
+    post:
+      tags:
+      - AC-06 Booking & Capacity
+      summary: Complete service execution
+      operationId: completeBooking
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /payments/{id}/checkout-session:
+    post:
+      tags:
+      - AC-07 Payment & Refund
+      summary: Create provider checkout session
+      operationId: createCheckoutSession
+      responses:
+        '200': *id002
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '503': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /payments/{id}:
+    get:
+      tags:
+      - AC-07 Payment & Refund
+      summary: Get payment status
+      operationId: getPayment
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /webhooks/midtrans/payments:
+    post:
+      tags:
+      - AC-07 Payment & Refund
+      summary: Receive verified Midtrans payment webhook
+      operationId: midtransPaymentWebhook
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+      security: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProviderWebhookPayload'
+      description: Provider signature/authentication is verified before mutation. Duplicate verified events return 200/no-op.
+        Payment PAID is monotonic.
+  /bookings/{id}/refunds:
+    get:
+      tags:
+      - AC-07 Payment & Refund
+      summary: List refunds for own booking
+      operationId: listBookingRefunds
+      responses:
+        '200': *id003
+        '401': *id001
+        '404': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /admin/payments:
+    get:
+      tags:
+      - AC-07 Payment & Refund
+      summary: List payments
+      operationId: adminListPayments
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-pawpals-permission: finance.payment.view
+  /admin/payments/{id}:
+    get:
+      tags:
+      - AC-07 Payment & Refund
+      summary: Get payment detail
+      operationId: adminGetPayment
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      x-pawpals-permission: finance.payment.view
+  /admin/refunds:
+    get:
+      tags:
+      - AC-07 Payment & Refund
+      summary: List refunds
+      operationId: adminListRefunds
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-pawpals-permission: finance.refund.manage
+  /admin/refunds/{id}:
+    get:
+      tags:
+      - AC-07 Payment & Refund
+      summary: Get refund detail
+      operationId: adminGetRefund
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      x-pawpals-permission: finance.refund.manage
+  /admin/payments/{id}/refunds:
+    post:
+      tags:
+      - AC-07 Payment & Refund
+      summary: Create corrective refund obligation
+      operationId: adminCreateCorrectiveRefund
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorrectiveRefundRequest'
+      x-pawpals-permission: finance.refund.manage
+  /admin/refunds/{id}/retry:
+    post:
+      tags:
+      - AC-07 Payment & Refund
+      summary: Controlled reconciled retry of the same refund obligation
+      operationId: adminRetryRefund
+      responses:
+        '200': *id002
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundRetryRequest'
+      x-pawpals-permission: finance.refund.manage
+      description: Allowed only for FAILED refund after canonical reconciliation establishes a definitively failed and safe-to-retry
+        prior attempt. Creates a new RefundAttempt and transitions FAILED -> PROCESSING. Blind retry is prohibited.
+  /bookings/{id}/cancellation-preview:
+    get:
+      tags:
+      - AC-08 Cancellation & Reschedule
+      summary: Preview cancellation refund and retained amount
+      operationId: getCancellationPreview
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /bookings/{id}/cancel:
+    post:
+      tags:
+      - AC-08 Cancellation & Reschedule
+      summary: Execute customer cancellation
+      operationId: cancelBookingAsCustomer
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancellationRequest'
+  /vendors/me/bookings/{id}/cancel:
+    post:
+      tags:
+      - AC-08 Cancellation & Reschedule
+      summary: Execute controlled vendor cancellation
+      operationId: cancelBookingAsVendor
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+  /vendors/me/cancellation-claims/{claimId}/respond:
+    post:
+      tags:
+      - AC-08 Cancellation & Reschedule
+      summary: Respond to vendor-cancellation claim
+      operationId: respondVendorCancellationClaim
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: claimId
+        in: path
+        required: true
+        description: claimId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorCancellationClaimResponseRequest'
+  /bookings/{id}/reschedules:
+    post:
+      tags:
+      - AC-08 Cancellation & Reschedule
+      summary: Customer self-reschedule
+      operationId: customerSelfReschedule
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RescheduleRequest'
+  /vendors/me/bookings/{id}/reschedule-proposals:
+    post:
+      tags:
+      - AC-08 Cancellation & Reschedule
+      summary: Create vendor reschedule proposal
+      operationId: createVendorRescheduleProposal
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RescheduleRequest'
+  /bookings/{bookingId}/reschedules/{rescheduleId}/accept:
+    post:
+      tags:
+      - AC-08 Cancellation & Reschedule
+      summary: Accept vendor reschedule proposal and atomically swap capacity
+      operationId: acceptRescheduleProposal
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: bookingId
+        in: path
+        required: true
+        description: bookingId UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: rescheduleId
+        in: path
+        required: true
+        description: rescheduleId UUID.
+        schema:
+          type: string
+          format: uuid
+  /bookings/{bookingId}/reschedules/{rescheduleId}/decline:
+    post:
+      tags:
+      - AC-08 Cancellation & Reschedule
+      summary: Decline vendor reschedule proposal
+      operationId: declineRescheduleProposal
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: bookingId
+        in: path
+        required: true
+        description: bookingId UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: rescheduleId
+        in: path
+        required: true
+        description: rescheduleId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: false
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptionalReasonRequest'
+  /vendors/me/finance/summary:
+    get:
+      tags:
+      - AC-09 Finance / Ledger / Settlement / Payout
+      summary: Get vendor finance summary
+      operationId: getVendorFinanceSummary
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+  /vendors/me/settlements:
+    get:
+      tags:
+      - AC-09 Finance / Ledger / Settlement / Payout
+      summary: List vendor settlements
+      operationId: listVendorSettlements
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /vendors/me/payouts:
+    get:
+      tags:
+      - AC-09 Finance / Ledger / Settlement / Payout
+      summary: List vendor payouts
+      operationId: listVendorPayouts
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /vendors/me/payouts/{id}:
+    get:
+      tags:
+      - AC-09 Finance / Ledger / Settlement / Payout
+      summary: Get vendor payout detail
+      operationId: getVendorPayout
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /vendors/me/payout-accounts:
+    get:
+      tags:
+      - AC-09 Finance / Ledger / Settlement / Payout
+      summary: List own masked payout accounts
+      operationId: listVendorPayoutAccounts
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      tags:
+      - AC-09 Finance / Ledger / Settlement / Payout
+      summary: Create or replace payout account
+      operationId: createVendorPayoutAccount
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayoutAccountWriteRequest'
+      description: Replacement requires recent reauth + purpose-bound PAYOUT_ACCOUNT_CHANGE OTP and creates a 24h security
+        hold. Initial account does not receive the change hold.
+  /admin/ledger:
+    get:
+      tags:
+      - AC-09 Finance / Ledger / Settlement / Payout
+      summary: List ledger entries
+      operationId: adminListLedger
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-pawpals-permission: finance.ledger.view
+  /admin/settlements:
+    get:
+      tags:
+      - AC-09 Finance / Ledger / Settlement / Payout
+      summary: List settlement items
+      operationId: adminListSettlements
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-pawpals-permission: finance.ledger.view
+  /admin/payouts:
+    get:
+      tags:
+      - AC-09 Finance / Ledger / Settlement / Payout
+      summary: List payouts
+      operationId: adminListPayouts
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-pawpals-permission: finance.payout.manage
+  /admin/payouts/{id}:
+    get:
+      tags:
+      - AC-09 Finance / Ledger / Settlement / Payout
+      summary: Get payout detail
+      operationId: adminGetPayout
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      x-pawpals-permission: finance.payout.manage
+  /admin/payouts/{id}/reconcile:
+    post:
+      tags:
+      - AC-09 Finance / Ledger / Settlement / Payout
+      summary: Reconcile payout provider state
+      operationId: adminReconcilePayout
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: false
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptionalReasonRequest'
+      x-pawpals-permission: finance.payout.manage
+  /bookings/{id}/chat/messages:
+    get:
+      tags:
+      - AC-10 Interaction / Milestone / Review
+      summary: List booking chat messages
+      operationId: listBookingChatMessages
+      responses:
+        '200': *id003
+        '401': *id001
+        '404': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      tags:
+      - AC-10 Interaction / Milestone / Review
+      summary: Append booking chat message
+      operationId: createBookingChatMessage
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessageRequest'
+  /bookings/{id}/chat/attachments/upload-intent:
+    post:
+      tags:
+      - AC-10 Interaction / Milestone / Review
+      summary: Create booking-private chat attachment upload intent
+      operationId: createChatAttachmentUploadIntent
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadIntentRequest'
+  /bookings/{id}/chat/read-state:
+    put:
+      tags:
+      - AC-10 Interaction / Milestone / Review
+      summary: Update chat read marker
+      operationId: updateChatReadState
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatReadStateRequest'
+  /bookings/{id}/milestones:
+    get:
+      tags:
+      - AC-10 Interaction / Milestone / Review
+      summary: List booking milestones
+      operationId: listBookingMilestones
+      responses:
+        '200': *id003
+        '401': *id001
+        '404': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /vendors/me/bookings/{id}/milestones:
+    post:
+      tags:
+      - AC-10 Interaction / Milestone / Review
+      summary: Create vendor milestone during IN_PROGRESS
+      operationId: createBookingMilestone
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MilestoneRequest'
+  /vendors/me/bookings/{id}/milestones/upload-intent:
+    post:
+      tags:
+      - AC-10 Interaction / Milestone / Review
+      summary: Create milestone-media upload intent
+      operationId: createMilestoneUploadIntent
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadIntentRequest'
+  /bookings/{id}/review:
+    post:
+      tags:
+      - AC-10 Interaction / Milestone / Review
+      summary: Create one-shot customer review after completion
+      operationId: createReview
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewRequest'
+  /vendors/{id}/reviews:
+    get:
+      tags:
+      - AC-10 Interaction / Milestone / Review
+      summary: List visible public vendor reviews
+      operationId: listVendorReviews
+      responses:
+        '200': *id003
+        '404': *id001
+      security: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /services/{id}/reviews:
+    get:
+      tags:
+      - AC-10 Interaction / Milestone / Review
+      summary: List visible public service reviews
+      operationId: listServiceReviews
+      responses:
+        '200': *id003
+        '404': *id001
+      security: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /bookings/{id}/cases:
+    post:
+      tags:
+      - AC-11 Trust & Safety
+      summary: Create booking-bound case
+      operationId: createCase
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CaseCreateRequest'
+  /cases:
+    get:
+      tags:
+      - AC-11 Trust & Safety
+      summary: List cases reported by current account
+      operationId: listCases
+      responses:
+        '200': *id003
+        '401': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /cases/{id}:
+    get:
+      tags:
+      - AC-11 Trust & Safety
+      summary: Get reporter-visible case detail
+      operationId: getCase
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+  /cases/{id}/evidence:
+    get:
+      tags:
+      - AC-11 Trust & Safety
+      summary: List reporter-visible case evidence
+      operationId: listCaseEvidence
+      responses:
+        '200': *id003
+        '401': *id001
+        '404': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      tags:
+      - AC-11 Trust & Safety
+      summary: Attach evidence to active case
+      operationId: attachCaseEvidence
+      responses:
+        '201': *id002
+        '400': *id001
+        '401': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CaseEvidenceAttachRequest'
+  /cases/{id}/evidence/upload-intent:
+    post:
+      tags:
+      - AC-11 Trust & Safety
+      summary: Create restricted-evidence upload intent
+      operationId: createCaseEvidenceUploadIntent
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadIntentRequest'
+  /admin/cases/{id}/assign:
+    post:
+      tags:
+      - AC-11 Trust & Safety
+      summary: Assign case
+      operationId: adminAssignCase
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      x-pawpals-permission: trust_safety.case.manage
+  /admin/cases/{id}/triage:
+    post:
+      tags:
+      - AC-11 Trust & Safety
+      summary: Triage case
+      operationId: adminTriageCase
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      x-pawpals-permission: trust_safety.case.manage
+  /admin/cases/{id}/investigation/start:
+    post:
+      tags:
+      - AC-11 Trust & Safety
+      summary: Start case investigation
+      operationId: adminInvestigationStartCase
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      x-pawpals-permission: trust_safety.case.manage
+  /admin/cases/{id}/resolve:
+    post:
+      tags:
+      - AC-11 Trust & Safety
+      summary: Resolve case
+      operationId: adminResolveCase
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      x-pawpals-permission: trust_safety.case.manage
+  /admin/cases/{id}/close:
+    post:
+      tags:
+      - AC-11 Trust & Safety
+      summary: Close case
+      operationId: adminCloseCase
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      x-pawpals-permission: trust_safety.case.manage
+  /admin/cases:
+    get:
+      tags:
+      - AC-11 Trust & Safety
+      summary: List trust and safety cases
+      operationId: adminListCases
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-pawpals-permission: trust_safety.case.manage
+  /admin/cases/{id}:
+    get:
+      tags:
+      - AC-11 Trust & Safety
+      summary: Get trust and safety case detail
+      operationId: adminGetCase
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      x-pawpals-permission: trust_safety.case.manage
+  /admin/cases/{id}/evidence/{evidenceId}/access:
+    post:
+      tags:
+      - AC-11 Trust & Safety
+      summary: Create audited short-lived access to restricted evidence
+      operationId: adminAccessCaseEvidence
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: evidenceId
+        in: path
+        required: true
+        description: evidenceId UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      x-pawpals-permission: trust_safety.sensitive_access
+  /admin/me:
+    get:
+      tags:
+      - AC-12 Admin / RBAC / Audit
+      summary: Get active admin capabilities
+      operationId: adminMe
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+  /admin/roles:
+    get:
+      tags:
+      - AC-12 Admin / RBAC / Audit
+      summary: List canonical roles
+      operationId: adminListRoles
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-pawpals-permission: admin.rbac.manage
+  /admin/permissions:
+    get:
+      tags:
+      - AC-12 Admin / RBAC / Audit
+      summary: List canonical permissions
+      operationId: adminListPermissions
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-pawpals-permission: admin.rbac.manage
+  /admin/accounts:
+    get:
+      summary: Minimal account directory; admin.rbac.manage required
+      operationId: listAdminAccounts
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /admin/vendors:
+    get:
+      summary: Vendor directory; operations.vendor.suspend required
+      operationId: listAdminVendors
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+  /admin/accounts/{id}/roles:
+    get:
+      tags:
+      - AC-12 Admin / RBAC / Audit
+      summary: List account admin roles
+      operationId: adminGetAccountRoles
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      x-pawpals-permission: admin.rbac.manage
+    post:
+      tags:
+      - AC-12 Admin / RBAC / Audit
+      summary: Assign canonical admin role
+      operationId: adminAssignAccountRole
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleAssignmentRequest'
+      x-pawpals-permission: admin.rbac.manage
+  /admin/accounts/{id}/roles/{roleCode}/revoke:
+    post:
+      tags:
+      - AC-12 Admin / RBAC / Audit
+      summary: Revoke canonical admin role
+      operationId: adminRevokeAccountRole
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      - name: roleCode
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/AdminRoleCode'
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      x-pawpals-permission: admin.rbac.manage
+  /admin/audit-logs:
+    get:
+      tags:
+      - AC-12 Admin / RBAC / Audit
+      summary: List sanitized audit logs
+      operationId: adminListAuditLogs
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-pawpals-permission: audit.view
+  /admin/bookings:
+    get:
+      tags:
+      - AC-12 Admin / RBAC / Audit
+      summary: List bookings for operations
+      operationId: adminListBookings
+      responses:
+        '200': *id003
+        '401': *id001
+        '403': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-pawpals-permission: operations.booking.view
+  /admin/bookings/{id}:
+    get:
+      tags:
+      - AC-12 Admin / RBAC / Audit
+      summary: Get booking for operations
+      operationId: adminGetBooking
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      x-pawpals-permission: operations.booking.view
+  /admin/vendors/{id}/suspend:
+    post:
+      tags:
+      - AC-12 Admin / RBAC / Audit
+      summary: Suspend vendor
+      operationId: adminSuspendVendor
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      x-pawpals-permission: operations.vendor.suspend
+  /admin/vendors/{id}/unsuspend:
+    post:
+      tags:
+      - AC-12 Admin / RBAC / Audit
+      summary: Unsuspend vendor
+      operationId: adminUnsuspendVendor
+      responses:
+        '200': *id002
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+        '409': *id001
+        '422': *id001
+      security:
+      - SessionCookie: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: id UUID.
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        description: Request payload as frozen by the PawPals API Contract.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReasonRequest'
+      x-pawpals-permission: operations.vendor.suspend
+  /services/{id}/booking-options:
+    get:
+      summary: Advisory booking slots with pet compatibility, 30-minute start increments.
+      operationId: bookingOptions
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      - name: package_id
+        in: query
+        required: true
+        schema: {type: string}
+      - name: pet_id
+        in: query
+        required: true
+        schema: {type: string}
+      - name: day
+        in: query
+        required: true
+        schema: {type: string}
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+  /bookings/{id}/media/{mediaId}:
+    get:
+      summary: Signed GET for media linked to booking; participant only.
+      operationId: bookingPrivateMedia
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      - name: mediaId
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+  /chat/conversations:
+    get:
+      summary: Current account conversations and unread counts.
+      operationId: chatConversations
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema: {type: integer}
+      - name: limit
+        in: query
+        required: false
+        schema: {type: integer}
+      - name: mode
+        in: query
+        required: false
+        schema: {type: string, enum: [customer, vendor]}
+      - name: booking_id
+        in: query
+        required: false
+        schema: {type: string, format: uuid}
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+  /admin/vendor-applications/{id}/documents:
+    get:
+      summary: Review permission required.
+      operationId: adminVerificationDocuments
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+  /admin/vendor-applications/{id}/documents/{documentId}/media:
+    get:
+      summary: Review permission required; private signed GET.
+      operationId: adminVerificationDocumentMedia
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      - name: documentId
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+  /bookings/{id}/reschedule-options:
+    get:
+      summary: Advisory availability, excludes current reservation.
+      operationId: rescheduleOptions
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      - name: day
+        in: query
+        required: true
+        schema: {type: string}
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+  /bookings/{id}/reschedule-proposals:
+    get:
+      summary: Participant-visible vendor proposals.
+      operationId: rescheduleProposals
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+
+
+components:
+  securitySchemes:
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: pawpals_session
+      description: Server-managed opaque session cookie. Browser cookie is HttpOnly; Secure on HTTPS. Cookie name is an implementation
+        convention for the codebase.
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  responses:
+    Success:
+      description: Successful response using the PawPals success envelope.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/SuccessEnvelope'
+    Paginated:
+      description: Paginated collection response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PaginatedEnvelope'
+    Error:
+      description: Canonical PawPals error envelope. Frontend branches on error.code.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+  schemas:
+    UUID:
+      type: string
+      format: uuid
+    DateTime:
+      type: string
+      format: date-time
+    MoneyIDR:
+      type: integer
+      format: int64
+      minimum: 0
+      description: Integer IDR. No floating-point nominal.
+    PositiveMoneyIDR:
+      type: integer
+      format: int64
+      minimum: 1
+      description: Positive integer IDR. Rp0/free booking is outside MVP.
+    GenericWritePayload:
+      type: object
+      additionalProperties: true
+      description: Placeholder only where the frozen API Contract defines the endpoint/behavior but does not freeze every
+        payload field. Must be narrowed before endpoint implementation.
+    SuccessEnvelope:
+      type: object
+      required:
+      - data
+      - request_id
+      properties:
+        data: {}
+        request_id:
+          type: string
+          format: uuid
+      additionalProperties: false
+    PaginatedEnvelope:
+      type: object
+      required:
+      - data
+      - request_id
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          - page
+          - limit
+          - total
+          - total_pages
+          properties:
+            items:
+              type: array
+              items: {}
+            page:
+              type: integer
+              minimum: 1
+            limit:
+              type: integer
+              minimum: 1
+              maximum: 100
+            total:
+              type: integer
+              minimum: 0
+            total_pages:
+              type: integer
+              minimum: 0
+          additionalProperties: false
+        request_id:
+          type: string
+          format: uuid
+      additionalProperties: false
+    ErrorEnvelope:
+      type: object
+      required:
+      - error
+      - request_id
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details: {}
+          additionalProperties: false
+        request_id:
+          type: string
+          format: uuid
+      additionalProperties: false
+    RegisterRequest:
+      type: object
+      required:
+      - phone_e164
+      - password
+      - display_name
+      properties:
+        phone_e164:
+          type: string
+          pattern: ^[+][1-9][0-9]{7,14}$
+          examples:
+          - '+6281234567890'
+        password:
+          type: string
+          format: password
+          minLength: 8
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 150
+      additionalProperties: false
+    OtpVerifyRequest:
+      type: object
+      required:
+      - challenge_id
+      - code
+      properties:
+        challenge_id:
+          $ref: '#/components/schemas/UUID'
+        code:
+          type: string
+          pattern: ^[0-9]{6}$
+      additionalProperties: false
+    OtpResendRequest:
+      type: object
+      required:
+      - challenge_id
+      properties:
+        challenge_id:
+          $ref: '#/components/schemas/UUID'
+      additionalProperties: false
+    LoginRequest:
+      type: object
+      required:
+      - phone_e164
+      - password
+      properties:
+        phone_e164:
+          type: string
+          pattern: ^[+][1-9][0-9]{7,14}$
+        password:
+          type: string
+          format: password
+      additionalProperties: false
+    ForgotPasswordRequest:
+      type: object
+      required:
+      - phone_e164
+      properties:
+        phone_e164:
+          type: string
+          pattern: ^[+][1-9][0-9]{7,14}$
+      additionalProperties: false
+    ResetPasswordRequest:
+      type: object
+      required:
+      - reset_authorization
+      - new_password
+      properties:
+        reset_authorization:
+          type: string
+        new_password:
+          type: string
+          format: password
+          minLength: 8
+      additionalProperties: false
+    ReauthRequest:
+      type: object
+      required:
+      - password
+      properties:
+        password:
+          type: string
+          format: password
+      additionalProperties: false
+    SensitiveOtpPurpose:
+      type: string
+      enum:
+      - PAYOUT_ACCOUNT_CHANGE
+      - SENSITIVE_PROFILE_CHANGE
+    SensitiveOtpRequest:
+      type: object
+      required:
+      - purpose
+      properties:
+        purpose:
+          $ref: '#/components/schemas/SensitiveOtpPurpose'
+      additionalProperties: false
+    SensitiveOtpVerifyRequest:
+      type: object
+      required:
+      - challenge_id
+      - code
+      - purpose
+      properties:
+        challenge_id:
+          $ref: '#/components/schemas/UUID'
+        code:
+          type: string
+          pattern: ^[0-9]{6}$
+        purpose:
+          $ref: '#/components/schemas/SensitiveOtpPurpose'
+      additionalProperties: false
+    VendorType:
+      type: string
+      enum:
+      - INDIVIDUAL
+      - BUSINESS
+    VendorApplicationCreateRequest:
+      type: object
+      required:
+      - vendor_type
+      properties:
+        vendor_type:
+          $ref: '#/components/schemas/VendorType'
+        public_display_name:
+          type: string
+          maxLength: 180
+      additionalProperties: false
+    TermsAcceptanceRequest:
+      type: object
+      required:
+      - terms_version
+      properties:
+        terms_version:
+          type: string
+          maxLength: 80
+      additionalProperties: false
+    UploadIntentRequest:
+      type: object
+      required:
+      - content_type
+      properties:
+        content_type:
+          type: string
+        file_name:
+          type: string
+      additionalProperties: false
+    MediaAttachRequest:
+      type: object
+      required:
+      - media_object_id
+      properties:
+        media_object_id:
+          $ref: '#/components/schemas/UUID'
+      additionalProperties: false
+    VerificationDocumentAttachRequest:
+      type: object
+      required:
+      - document_type
+      - media_object_id
+      properties:
+        document_type:
+          type: string
+          enum:
+          - KTP
+          - VERIFICATION_SELFIE
+          - NIB_BUSINESS_EVIDENCE
+          - PROFESSIONAL_CREDENTIAL
+          - PORTFOLIO
+        media_object_id:
+          $ref: '#/components/schemas/UUID'
+      additionalProperties: false
+    VerificationDocumentReviewRequest:
+      type: object
+      required:
+      - status
+      properties:
+        status:
+          type: string
+          enum:
+          - VERIFIED
+          - NEEDS_REPLACEMENT
+          - REJECTED
+        reason:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+      allOf:
+      - if:
+          properties:
+            status:
+              enum:
+              - NEEDS_REPLACEMENT
+              - REJECTED
+        then:
+          required:
+          - reason
+      additionalProperties: false
+    ReasonRequest:
+      type: object
+      required:
+      - reason
+      properties:
+        reason:
+          type: string
+          minLength: 1
+      additionalProperties: false
+    OptionalReasonRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          minLength: 1
+      additionalProperties: false
+    AddressWriteRequest:
+      type: object
+      required:
+      - address_line1
+      - latitude
+      - longitude
+      properties:
+        label:
+          type:
+          - string
+          - 'null'
+          maxLength: 80
+        address_line1:
+          type: string
+          minLength: 1
+        address_line2:
+          type:
+          - string
+          - 'null'
+        city:
+          type:
+          - string
+          - 'null'
+          maxLength: 120
+        province:
+          type:
+          - string
+          - 'null'
+          maxLength: 120
+        postal_code:
+          type:
+          - string
+          - 'null'
+          maxLength: 20
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+      additionalProperties: false
+    VendorLocationWriteRequest:
+      allOf:
+      - $ref: '#/components/schemas/AddressWriteRequest'
+      - type: object
+        required:
+        - location_type
+        properties:
+          location_type:
+            type: string
+            enum:
+            - VERIFICATION_PRIVATE
+            - OPERATIONAL_PRIVATE
+            - PUBLIC_BUSINESS
+    PetWriteRequest:
+      type: object
+      required:
+      - name
+      - species_code
+      properties:
+        name:
+          type: string
+          minLength: 1
+        species_code:
+          type: string
+        breed:
+          type:
+          - string
+          - 'null'
+        birth_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        sex:
+          type:
+          - string
+          - 'null'
+        weight_kg:
+          type:
+          - number
+          - 'null'
+          minimum: 0
+        size_code:
+          type:
+          - string
+          - 'null'
+      additionalProperties: true
+    PetSafetyProfileWriteRequest:
+      type: object
+      properties:
+        is_reactive:
+          type:
+          - boolean
+          - 'null'
+        aggression_history:
+          type:
+          - boolean
+          - 'null'
+        escape_risk:
+          type:
+          - boolean
+          - 'null'
+        leash_behavior_notes:
+          type:
+          - string
+          - 'null'
+        handling_sensitivity_notes:
+          type:
+          - string
+          - 'null'
+        allergy_notes:
+          type:
+          - string
+          - 'null'
+        known_health_history:
+          type:
+          - string
+          - 'null'
+        medication_notes:
+          type:
+          - string
+          - 'null'
+        routine_notes:
+          type:
+          - string
+          - 'null'
+        emergency_contact_name:
+          type:
+          - string
+          - 'null'
+        emergency_contact_phone:
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    VendorServiceWriteRequest:
+      type: object
+      properties:
+        origin_vendor_location_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        category_code:
+          type: string
+          maxLength: 80
+        name:
+          type: string
+          maxLength: 180
+        description:
+          type:
+          - string
+          - 'null'
+        delivery_mode:
+          type: string
+          enum:
+          - AT_VENDOR
+          - AT_CUSTOMER
+        service_radius_meters:
+          type:
+          - integer
+          - 'null'
+          minimum: 1
+        minimum_notice_minutes:
+          type: integer
+          minimum: 0
+        buffer_after_minutes:
+          type: integer
+          minimum: 0
+        base_capacity:
+          type: integer
+          minimum: 1
+      additionalProperties: false
+    ServicePackageWriteRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type:
+          - string
+          - 'null'
+        duration_minutes:
+          type: integer
+          minimum: 1
+        price_amount:
+          $ref: '#/components/schemas/PositiveMoneyIDR'
+        currency:
+          type: string
+          const: IDR
+      additionalProperties: false
+    PetRulesWriteRequest:
+      type: object
+      required:
+      - accepted_species
+      - accepts_reactive
+      - accepts_aggressive_history
+      properties:
+        accepted_species:
+          type: array
+          items:
+            type: string
+        accepted_size_codes:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+        accepts_reactive:
+          type: boolean
+        accepts_aggressive_history:
+          type: boolean
+        deterministic_restrictions:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+        context_notes:
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    TimeWindowWriteRequest:
+      type: object
+      required:
+      - starts_at
+      - ends_at
+      properties:
+        starts_at:
+          $ref: '#/components/schemas/DateTime'
+        ends_at:
+          $ref: '#/components/schemas/DateTime'
+      additionalProperties: false
+    CapacityOverrideWriteRequest:
+      type: object
+      required:
+      - starts_at
+      - ends_at
+      - capacity
+      properties:
+        starts_at:
+          $ref: '#/components/schemas/DateTime'
+        ends_at:
+          $ref: '#/components/schemas/DateTime'
+        capacity:
+          type: integer
+          minimum: 0
+      additionalProperties: false
+    CreateBookingRequest:
+      type: object
+      required:
+      - vendor_service_id
+      - service_package_id
+      - pet_id
+      - scheduled_start_at
+      properties:
+        vendor_service_id:
+          $ref: '#/components/schemas/UUID'
+        service_package_id:
+          $ref: '#/components/schemas/UUID'
+        pet_id:
+          $ref: '#/components/schemas/UUID'
+        scheduled_start_at:
+          $ref: '#/components/schemas/DateTime'
+        booking_specific_notes:
+          type:
+          - string
+          - 'null'
+        customer_address_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+          description: Required only for AT_CUSTOMER.
+      additionalProperties: false
+    ProviderWebhookPayload:
+      type: object
+      additionalProperties: true
+      description: Raw provider payload. Signature/authentication is verified before canonical state mutation; sensitive raw
+        payload must not be exposed in ordinary API responses or audit logs.
+    CorrectiveRefundRequest:
+      type: object
+      required:
+      - amount
+      - reason
+      properties:
+        amount:
+          $ref: '#/components/schemas/PositiveMoneyIDR'
+        reason:
+          type: string
+          minLength: 1
+      additionalProperties: false
+    RefundRetryRequest:
+      type: object
+      required:
+      - reason
+      properties:
+        reason:
+          type: string
+          minLength: 1
+      additionalProperties: false
+    CancellationRequest:
+      type: object
+      properties:
+        reason_code:
+          type:
+          - string
+          - 'null'
+        reason_text:
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    VendorCancellationClaimResponseRequest:
+      type: object
+      required:
+      - response
+      properties:
+        response:
+          type: string
+          enum:
+          - ADMIT
+          - DENY
+        reason:
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    RescheduleRequest:
+      type: object
+      required:
+      - scheduled_start_at
+      properties:
+        scheduled_start_at:
+          $ref: '#/components/schemas/DateTime'
+      additionalProperties: false
+    PayoutAccountWriteRequest:
+      type: object
+      required:
+      - bank_code
+      - account_holder_name
+      - account_number
+      properties:
+        bank_code:
+          type: string
+          maxLength: 50
+        account_holder_name:
+          type: string
+          maxLength: 180
+        account_number:
+          type: string
+          minLength: 4
+      additionalProperties: false
+    ChatMessageRequest:
+      type: object
+      required:
+      - message_type
+      properties:
+        message_type:
+          type: string
+          enum:
+          - TEXT
+          - IMAGE
+        body_text:
+          type:
+          - string
+          - 'null'
+        attachment_media_object_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+      additionalProperties: false
+    ChatReadStateRequest:
+      type: object
+      properties:
+        last_read_message_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+      additionalProperties: false
+    MilestoneRequest:
+      type: object
+      required:
+      - milestone_type
+      - occurred_at
+      properties:
+        milestone_type:
+          type: string
+        description:
+          type:
+          - string
+          - 'null'
+        media_object_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        occurred_at:
+          $ref: '#/components/schemas/DateTime'
+      additionalProperties: false
+    ReviewRequest:
+      type: object
+      required:
+      - rating
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type:
+          - string
+          - 'null'
+      additionalProperties: true
+    CaseCreateRequest:
+      type: object
+      required:
+      - case_type
+      properties:
+        case_type:
+          type: string
+          enum:
+          - REPORT
+          - INCIDENT
+          - DISPUTE
+        description:
+          type:
+          - string
+          - 'null'
+      additionalProperties: true
+    CaseEvidenceAttachRequest:
+      type: object
+      required:
+      - media_object_id
+      properties:
+        media_object_id:
+          $ref: '#/components/schemas/UUID'
+        description:
+          type:
+          - string
+          - 'null'
+      additionalProperties: false
+    AdminRoleCode:
+      type: string
+      enum:
+      - SUPER_ADMIN
+      - OPERATIONS_ADMIN
+      - FINANCE_ADMIN
+      - TRUST_SAFETY_ADMIN
+    RoleAssignmentRequest:
+      type: object
+      required:
+      - role_code
+      - reason
+      properties:
+        role_code:
+          $ref: '#/components/schemas/AdminRoleCode'
+        reason:
+          type: string
+          minLength: 1
+      additionalProperties: false
+security:
+- SessionCookie: []

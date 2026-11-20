@@ -1,0 +1,4 @@
+import { randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
+function scryptAsync(password:string,salt:any):Promise<any>{ return new Promise((resolve,reject)=>scrypt(password,salt,64,(e:any,d:any)=>e?reject(e):resolve(d))); }
+export async function hashPassword(password:string):Promise<string>{ if(password.length<10||password.length>128) throw new Error('PASSWORD_POLICY'); const salt=randomBytes(16); const hash=await scryptAsync(password,salt); return `scrypt$${salt.toString('base64url')}$${hash.toString('base64url')}`; }
+export async function verifyPassword(password:string,encoded:string):Promise<boolean>{ const [alg,s,h]=encoded.split('$'); if(alg!=='scrypt'||!s||!h)return false; const actual=await scryptAsync(password,Buffer.from(s,'base64url')); const expected=Buffer.from(h,'base64url'); return actual.length===expected.length&&timingSafeEqual(actual,expected); }

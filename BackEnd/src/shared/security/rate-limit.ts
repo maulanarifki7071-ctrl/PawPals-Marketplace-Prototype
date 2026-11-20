@@ -1,0 +1,7 @@
+import { AppError } from '../errors/app-error';
+import {env} from '../../config/env';
+let redis:any; const local=new Map<string,{count:number;reset:number}>();
+function client(){if(redis!==undefined)return redis;if(!process.env.REDIS_URL){redis=null;return null;}try{const Redis=require('ioredis');redis=new Redis(process.env.REDIS_URL,{lazyConnect:false,maxRetriesPerRequest:1,enableOfflineQueue:false});let warned=false;redis.on('error',(e:any)=>{if(!warned){warned=true;console.warn('Redis rate limiter unavailable:',String(e?.message??e));}});redis.on('ready',()=>{warned=false});return redis;}catch{redis=null;return null;}}
+export async function enforceRateLimit(key:string,limit:number,windowSeconds:number):Promise<void>{const r=client();if(r){try{const k=`pawpals:rl:${key}`;const count=await r.incr(k);if(count===1)await r.expire(k,windowSeconds);if(count>limit)throw new AppError(429,'RATE_LIMITED','Too many requests. Please retry later.');return;}catch(e){if(e instanceof AppError)throw e;if(env.nodeEnv==='production')throw new AppError(503,'RATE_LIMIT_UNAVAILABLE','Security rate limiter is unavailable.');/* local fallback for dev */}}
+ if(env.nodeEnv==='production')throw new AppError(503,'RATE_LIMIT_UNAVAILABLE','Redis rate limiter must be configured.');
+ const now=Date.now(),entry=local.get(key);if(!entry||entry.reset<=now){local.set(key,{count:1,reset:now+windowSeconds*1000});return;}entry.count++;if(entry.count>limit)throw new AppError(429,'RATE_LIMITED','Too many requests. Please retry later.');}

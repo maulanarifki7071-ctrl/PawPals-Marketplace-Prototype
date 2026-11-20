@@ -1,0 +1,4 @@
+export async function audit(tx:any,input:{actorType?:string;actorId?:string|null;action:string;targetType:string;targetId?:string|null;reason?:string|null;metadata?:any}){
+ await tx.query(`INSERT INTO audit_logs(actor_type,actor_account_id,action,target_type,target_id,reason,metadata_sanitized_json) VALUES($1,$2,$3,$4,$5,$6,$7::jsonb)`,[input.actorType??(input.actorId?'ACCOUNT':'SYSTEM'),input.actorId??null,input.action,input.targetType,input.targetId??null,input.reason??null,JSON.stringify(input.metadata??{})]);
+}
+export async function outbox(tx:any,eventKey:string,aggregateType:string,aggregateId:string,eventType:string,payload:any={}){await tx.query(`INSERT INTO outbox_events(event_key,aggregate_type,aggregate_id,event_type,payload_json) VALUES($1,$2,$3,$4,$5::jsonb) ON CONFLICT(event_key) DO NOTHING`,[eventKey,aggregateType,aggregateId,eventType,JSON.stringify(payload)]);}

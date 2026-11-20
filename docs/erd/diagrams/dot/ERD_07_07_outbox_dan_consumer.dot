@@ -1,0 +1,8 @@
+digraph schema {
+graph [rankdir=TB, bgcolor="white", pad="0.35", nodesep="0.40", ranksep="0.8", splines=polyline, overlap=false];
+node [shape=plain, fontname="DejaVu Sans"];
+edge [color="#7d8c9a", arrowsize=0.6, penwidth=1.1, fontname="DejaVu Sans", fontsize=8];
+"outbox_events" [label=<<TABLE BORDER="1" COLOR="#b6cbd1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#f7fafb"><TR><TD BGCOLOR="#16827b" COLSPAN="2" ALIGN="LEFT"><FONT COLOR="white" POINT-SIZE="12"><B>outbox_events</B></FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="9">id</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#526276" POINT-SIZE="8">PK uuid</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="9">event_key</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#526276" POINT-SIZE="8"> varchar(180)</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="9">event_type</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#526276" POINT-SIZE="8"> varchar(150)</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="9">status</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#526276" POINT-SIZE="8"> outbox_event_status</FONT></TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><FONT COLOR="#81909b" POINT-SIZE="8">+8 other fields</FONT></TD></TR></TABLE>>];
+"outbox_consumptions" [label=<<TABLE BORDER="1" COLOR="#b6cbd1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#f7fafb"><TR><TD BGCOLOR="#16827b" COLSPAN="2" ALIGN="LEFT"><FONT COLOR="white" POINT-SIZE="12"><B>outbox_consumptions</B></FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="9">event_key</FONT></TD><TD ALIGN="LEFT"><FONT COLOR="#526276" POINT-SIZE="8">PK varchar(180)</FONT></TD></TR><TR><TD COLSPAN="2" ALIGN="LEFT"><FONT COLOR="#81909b" POINT-SIZE="8">+3 other fields</FONT></TD></TR></TABLE>>];
+"outbox_consumptions" -> "outbox_events" ;
+}

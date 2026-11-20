@@ -1,0 +1,6 @@
+import {ArrowUpRight,MapPin,Star} from 'lucide-react'
+import {Link} from 'react-router-dom'
+import type {Service} from '../../types/Service'
+import {deliveryLabel,formatRupiah} from '../../types/Service'
+import {servicePhoto,categoryLabel} from './photo'
+export default function ServiceCard({service:s}:{service:Service}){return <article className="service-tile"><Link to={'/layanan/'+s.id} className="tile-photo"><img src={servicePhoto(s)} alt="Ilustrasi kategori layanan" loading="lazy"/><span>{categoryLabel(s.category_code)}</span><small>Ilustrasi</small></Link><div className="tile-body"><h3><Link to={'/layanan/'+s.id}>{s.name}</Link></h3><p>{s.public_display_name||'Mitra PawPals'}</p><div className="tile-meta"><span><Star size={15} fill="#E6AC48" stroke="#C98F28"/>{Number(s.rating_count)>0?`${Number(s.rating_avg).toFixed(1)} (${s.rating_count})`:'Belum ada ulasan'}</span>{s.public_city&&<span><MapPin size={14}/>{s.public_city}</span>}</div><div className="tile-bottom"><div><small>{deliveryLabel(s.delivery_mode)}</small><strong>{s.min_price!=null?formatRupiah(s.min_price):'Lihat paket'}</strong></div><Link aria-label={'Lihat '+s.name} to={'/layanan/'+s.id} className="tile-link"><ArrowUpRight size={19}/></Link></div></div></article>}
